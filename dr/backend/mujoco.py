@@ -26,10 +26,12 @@ class MujocoBackend(Backend):
         self.get_world(env).opt.gravity[2] = -g
 
     def get_damping_coefficients(self, env):
-        raise NotImplementedError
+        return np.array(self.get_world(env).dof_damping[3:])
+        # raise NotImplementedError
 
     def set_damping_coefficients(self, env, damping_coefficients):
-        raise NotImplementedError
+        self.get_world(env).dof_damping[3:] = damping_coefficients
+        # raise NotImplementedError
 
     def get_collision_detector(self, env):
         pass
