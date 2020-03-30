@@ -1,0 +1,30 @@
+FROM sharadmv/domain-randomization
+
+# mujoco setup (for reference)
+# ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root/.mujoco/mjpro150/bin
+# RUN curl -L https://www.roboti.us/download/mjpro150_linux.zip > /root/lib/mjpro_150_linux.zip
+# RUN mkdir /root/.mujoco; unzip /root/lib/mjpro_150_linux.zip -d /root/.mujoco
+# RUN touch /root/.mujoco/mjkey.txt
+
+# Copy mujoco license from host
+WORKDIR /root/.mujoco
+COPY mjkey.txt .
+
+# Replacing sharadmv/domain-randomization.git with quanvuong/domain_randomization.git
+RUN rm -rf /root/work/
+RUN mkdir /root/work
+WORKDIR /root/work
+RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+RUN git clone https://github.com/quanvuong/domain_randomization.git
+WORKDIR /root/work/domain_randomization
+RUN git pull origin master
+
+WORKDIR /root/work
+RUN git clone https://github.com/quanvuong/baselines.git
+WORKDIR /root/work/domain-randomization
+ENV PIPENV_TIMEOUT=9999
+ENV PIP_NO_CACHE_DIR=false
+RUN pipenv install -e ../baselines --verbose
+
+RUN pipenv run pip install https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp36-cp36m-linux_x86_64.whl
