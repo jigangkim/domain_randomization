@@ -36,7 +36,7 @@ class CEMOptimizer(object):
                  upper_bound=None, lower_bound=None, epsilon=0.001, alpha=0.25, viz_dir=None):
         """Creates an instance of this class.
         Arguments:
-            sol_dim (int): The dimensionality of the problem space
+            sol_dim (int): The dimensionality of the problem space -> useless
             max_iters (int): The maximum number of iterations to perform during optimization
             popsize (int): The number of candidate solutions to be sampled at every iteration
             num_elites (int): The number of top solutions that will be used to obtain the distribution
@@ -84,6 +84,10 @@ class CEMOptimizer(object):
             lb_dist, ub_dist = mean - self.lb, self.ub - mean
             constrained_var = np.minimum(np.minimum(np.square(lb_dist / 2), np.square(ub_dist / 2)), var)
 
+            if self.sol_dim != np.shape(mean)[0]:
+                print('sol_dim is set to %d but the actual dim is'%(self.sol_dim), np.shape(mean))
+                print('setting sol_dim to %d ...'%(np.shape(mean)[0]))
+                self.sol_dim = np.shape(mean)[0]
             samples = X.rvs(size=[self.popsize, self.sol_dim]) * np.sqrt(constrained_var) + mean
             samples = samples.astype(np.float32)
 
